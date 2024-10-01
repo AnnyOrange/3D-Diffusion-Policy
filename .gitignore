@@ -48,3 +48,7 @@ nano .gitignore
 output/
 /3D-Diffusion-Policy/data/
 3D-Diffusion-Policy/data/
+third_party/dexart_assets.zip
+third_party/vrl3_ckpts.zip
+third_party/VRL3/vrl3_ckpts/*.pt
+
