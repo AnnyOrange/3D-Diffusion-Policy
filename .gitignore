@@ -52,4 +52,6 @@ easytrain.sh
 nohup.out
 output/
 
+third_party/pytorch3d_simplified/2.1.0.zip
+third_party/pytorch3d_simplified/cub-2.1.0
 
