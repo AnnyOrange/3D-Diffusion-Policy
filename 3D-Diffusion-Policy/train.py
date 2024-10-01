@@ -362,6 +362,47 @@ class TrainDP3Workspace:
         for key, value in runner_log.items():
             if isinstance(value, float):
                 cprint(f"{key}: {value:.4f}", 'magenta')
+                
+    def load_mw_policy(self,task_name):
+        if task_name == 'peg-insert-side':
+            agent = SawyerPegInsertionSideV2Policy()
+        else:
+            task_name = task_name.split('-')
+            task_name = [s.capitalize() for s in task_name]
+            task_name = "Sawyer" + "".join(task_name) + "V2Policy"
+            agent = eval(task_name)()
+        return agent
+    
+    def replay(self):
+        # load the latest checkpoint
+        
+        cfg = copy.deepcopy(self.cfg)
+        
+        # lastest_ckpt_path = self.get_checkpoint_path(tag="latest")
+        # if lastest_ckpt_path.is_file():
+        #     cprint(f"Resuming from checkpoint {lastest_ckpt_path}", 'magenta')
+        #     self.load_checkpoint(path=lastest_ckpt_path)
+        
+        # # configure env
+        env_runner: BaseRunner
+        env_runner = hydra.utils.instantiate(
+            cfg.task.env_runner,
+            output_dir=self.output_dir)
+        # print("env_runner",env_runner)
+        assert isinstance(env_runner, BaseRunner)
+        # policy = self.model
+        # if cfg.training.use_ema:
+        #     policy = self.ema_model
+        # policy.eval()
+        # policy.cuda()
+        # policy = self.load_mw_policy(env_name)
+        runner_log = env_runner.run()
+        
+      
+        cprint(f"---------------- Eval Results --------------", 'magenta')
+        for key, value in runner_log.items():
+            if isinstance(value, float):
+                cprint(f"{key}: {value:.4f}", 'magenta')
         
     @property
     def output_dir(self):

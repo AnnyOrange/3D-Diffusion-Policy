@@ -1,7 +1,7 @@
 # use the same command as training except the script
 # for example:
 # bash scripts/eval_policy.sh dp3 adroit_hammer 0322 0 0
-
+# bash scripts/eval_policy.sh dp3 metaworld_basketball 0322 0 0
 
 
 DEBUG=False
@@ -21,7 +21,7 @@ cd 3D-Diffusion-Policy
 
 export HYDRA_FULL_ERROR=1
 export CUDA_VISIBLE_DEVICES=${gpu_id}
-python eval.py --config-name=${config_name}.yaml \
+python replay.py --config-name=${config_name}.yaml \
                             task=${task_name} \
                             hydra.run.dir=${run_dir} \
                             training.debug=$DEBUG \

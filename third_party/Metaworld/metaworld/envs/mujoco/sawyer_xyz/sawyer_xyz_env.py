@@ -9,7 +9,7 @@ import numpy as np
 
 from metaworld.envs import reward_utils
 from metaworld.envs.mujoco.mujoco_env import MujocoEnv, _assert_task_is_set
-
+from gym.utils import seeding 
 
 class SawyerMocapBase(MujocoEnv, metaclass=abc.ABCMeta):
     """
@@ -111,8 +111,8 @@ class SawyerXYZEnv(SawyerMocapBase, metaclass=abc.ABCMeta):
         self.mocap_low = np.hstack(mocap_low)
         self.mocap_high = np.hstack(mocap_high)
         self.curr_path_length = 0
-        self.seeded_rand_vec = False
-        self._freeze_rand_vec = True
+        self.seeded_rand_vec = True
+        self._freeze_rand_vec = False
         self._last_rand_vec = None
 
         # We use continuous goal space by default and
@@ -153,6 +153,10 @@ class SawyerXYZEnv(SawyerMocapBase, metaclass=abc.ABCMeta):
     def _set_task_inner(self):
         # Doesn't absorb "extra" kwargs, to ensure nothing's missed.
         pass
+    # def seed(self, seed=None):
+    #     # 使用 Gym 的 seeding 工具来创建带种子的随机数生成器
+    #     self.np_random, seed = seeding.np_random(seed)
+    #     return [seed]
 
     def set_task(self, task):
         self._set_task_called = True
@@ -457,6 +461,7 @@ class SawyerXYZEnv(SawyerMocapBase, metaclass=abc.ABCMeta):
 
     def reset(self):
         self.curr_path_length = 0
+        # import pdb;pdb.set_trace()
         return super().reset()
 
     def _reset_hand(self, steps=50):
@@ -464,19 +469,24 @@ class SawyerXYZEnv(SawyerMocapBase, metaclass=abc.ABCMeta):
             self.data.set_mocap_pos('mocap', self.hand_init_pos)
             self.data.set_mocap_quat('mocap', np.array([1, 0, 1, 0]))
             self.do_simulation([-1, 1], self.frame_skip)
+        # import pdb;pdb.set_trace()
         self.init_tcp = self.tcp_center
 
     def _get_state_rand_vec(self):
         if self._freeze_rand_vec:
+            # print("freeze")
             assert self._last_rand_vec is not None
             return self._last_rand_vec
         elif self.seeded_rand_vec:
+            # print("seed")
+            # print(self.np_random)
             rand_vec = self.np_random.uniform(
                 self._random_reset_space.low,
                 self._random_reset_space.high,
                 size=self._random_reset_space.low.size)
             return rand_vec
         else:
+            # print("last")
             rand_vec = np.random.uniform(
                 self._random_reset_space.low,
                 self._random_reset_space.high,

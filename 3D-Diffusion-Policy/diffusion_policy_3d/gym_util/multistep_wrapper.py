@@ -115,7 +115,7 @@ class MultiStepWrapper(gym.Wrapper):
         self.n_obs_steps = n_obs_steps
         self.n_action_steps = n_action_steps
         self.reward_agg_method = reward_agg_method
-        self.n_obs_steps = n_obs_steps
+        # self.n_obs_steps = n_obs_steps
 
         self.obs = deque(maxlen=n_obs_steps+1)
         self.reward = list()
@@ -131,7 +131,8 @@ class MultiStepWrapper(gym.Wrapper):
         self.done = list()
         self.info = defaultdict(lambda : deque(maxlen=self.n_obs_steps+1))
 
-        obs = self._get_obs(self.n_obs_steps)
+        # obs = self._get_obs(self.n_obs_steps)
+        obs = self._get_obs()
         return obs
 
     def step(self, action):

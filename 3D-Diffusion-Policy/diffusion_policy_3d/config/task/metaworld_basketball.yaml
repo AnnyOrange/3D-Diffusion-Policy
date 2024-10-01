@@ -32,6 +32,6 @@ dataset:
   horizon: ${horizon}
   pad_before: ${eval:'${n_obs_steps}-1'}
   pad_after: ${eval:'${n_action_steps}-1'}
-  seed: 42
+  seed: 73
   val_ratio: 0.02
   max_train_episodes: 90

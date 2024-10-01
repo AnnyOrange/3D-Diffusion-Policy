@@ -52,7 +52,9 @@ class MetaworldRunner(BaseRunner):
         self.fps = fps
         self.crf = crf
         self.n_obs_steps = n_obs_steps
+        print("self.n_obs_steps",self.n_obs_steps)
         self.n_action_steps = n_action_steps
+        print("self.n_action_steps",self.n_action_steps)
         self.max_steps = max_steps
         self.tqdm_interval_sec = tqdm_interval_sec
 
@@ -92,7 +94,7 @@ class MetaworldRunner(BaseRunner):
                 np_action_dict = dict_apply(action_dict,
                                             lambda x: x.detach().to('cpu').numpy())
                 action = np_action_dict['action'].squeeze(0)
-
+                print(action.shape)
                 obs, reward, done, info = env.step(action)
 
 

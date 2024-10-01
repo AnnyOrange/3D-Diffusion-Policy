@@ -12,7 +12,9 @@ from metaworld.policies import *
 # faulthandler.enable()
 
 seed = np.random.randint(0, 100)
+seed = 73
 
+print(seed)
 def load_mw_policy(task_name):
 	if task_name == 'peg-insert-side':
 		agent = SawyerPegInsertionSideV2Policy()
@@ -28,6 +30,10 @@ def main(args):
 
 	
 	save_dir = os.path.join(args.root_dir, 'metaworld_'+args.env_name+'_expert.zarr')
+	save_dir_2 = os.path.join(save_dir,'seed.txt')
+	print(f"Saving seed to: {save_dir_2}")
+	with open(save_dir_2, 'w') as f:
+		f.write(str(seed))
 	if os.path.exists(save_dir):
 		cprint('Data already exists at {}'.format(save_dir), 'red')
 		cprint("If you want to overwrite, delete the existing directory first.", "red")
@@ -46,7 +52,7 @@ def main(args):
 	num_episodes = args.num_episodes
 	cprint(f"Number of episodes : {num_episodes}", "yellow")
 	
-
+	
 	total_count = 0
 	img_arrays = []
 	point_cloud_arrays = []
@@ -55,12 +61,15 @@ def main(args):
 	full_state_arrays = []
 	action_arrays = []
 	episode_ends_arrays = []
-    
-	
+	info_arrays = []
+	info_grasp_arrays = []
+	info_near_arrays = []
+	total_subs = []
 	episode_idx = 0
 	
 
 	mw_policy = load_mw_policy(env_name)
+	print(mw_policy)
 	
 	# loop over episodes
 	while episode_idx < num_episodes:
@@ -82,6 +91,10 @@ def main(args):
 		state_arrays_sub = []
 		full_state_arrays_sub = []
 		action_arrays_sub = []
+		info_arrays_sub = []
+		info_near_arrays_sub = []
+		info_grasp_arrays_sub = []
+
 		total_count_sub = 0
   
 		while not done:
@@ -104,17 +117,29 @@ def main(args):
 		
 			action_arrays_sub.append(action)
 			obs_dict, reward, done, info = e.step(action)
+			print("raw_state",raw_state[:3])
+			print("action",action[:3])
+			# print("obs",len(obs_dict['full_state']))
+			# print("action",action)
+			# print("action",action)
+			# print("obs_dict",obs_dict)
+			# print("info",info)
+			# print("info",info['grasp_success'])
+			info_near_arrays_sub.append(info['near_object'])
+			info_grasp_arrays_sub.append(info['grasp_success'])
+
 			raw_state = obs_dict['full_state']
 			ep_reward += reward
    
-
 			ep_success = ep_success or info['success']
 			ep_success_times += info['success']
    
 			if done:
+				# print("total_sub",total_count_sub)
+				total_subs.append(total_count_sub)
 				break
 		
-
+		# print("len(action)",len(action_arrays_sub))
 		if not ep_success or ep_success_times < 5:
 			cprint(f'Episode: {episode_idx} failed with reward {ep_reward} and success times {ep_success_times}', 'red')
 			continue
@@ -126,8 +151,13 @@ def main(args):
 			depth_arrays.extend(copy.deepcopy(depth_arrays_sub))
 			state_arrays.extend(copy.deepcopy(state_arrays_sub))
 			action_arrays.extend(copy.deepcopy(action_arrays_sub))
+			info_near_arrays.extend(copy.deepcopy(info_near_arrays_sub))
+			info_grasp_arrays.extend(copy.deepcopy(info_grasp_arrays_sub))
 			full_state_arrays.extend(copy.deepcopy(full_state_arrays_sub))
 			cprint('Episode: {}, Reward: {}, Success Times: {}'.format(episode_idx, ep_reward, ep_success_times), 'green')
+			save_dir_3 = os.path.join(save_dir,'succ_reward.txt')
+			with open(save_dir_3, 'a') as f:
+				f.write('Episode: {}, Reward: {}, Success Times: {}\n'.format(episode_idx, ep_reward, ep_success_times))
 			episode_idx += 1
 	
 
@@ -147,7 +177,13 @@ def main(args):
 	full_state_arrays = np.stack(full_state_arrays, axis=0)
 	point_cloud_arrays = np.stack(point_cloud_arrays, axis=0)
 	depth_arrays = np.stack(depth_arrays, axis=0)
+	action_arrays = np.array(action_arrays)
+	# print("actions_array.shape",action_arrays.shape)
 	action_arrays = np.stack(action_arrays, axis=0)
+	# info_arrays = np.array(info_arrays)
+	# info_arrays = np.stack(info_arrays, axis=0)
+	# if info_arrays.ndim == 1:
+	# 	info_arrays = info_arrays[:, np.newaxis]
 	episode_ends_arrays = np.array(episode_ends_arrays)
 
 	compressor = zarr.Blosc(cname='zstd', clevel=3, shuffle=1)
@@ -157,6 +193,11 @@ def main(args):
 	point_cloud_chunk_size = (100, point_cloud_arrays.shape[1], point_cloud_arrays.shape[2])
 	depth_chunk_size = (100, depth_arrays.shape[1], depth_arrays.shape[2])
 	action_chunk_size = (100, action_arrays.shape[1])
+	# info_chunk_size = (100, info_arrays.shape[1])  # 根据info的字段数量设置chunk大小
+	total_sub_chunk_size = (200,)  # 设置chunk大小，通常可以设置为(100,)或其他合适的值
+	zarr_data.create_dataset('total_sub', data=total_subs, chunks=total_sub_chunk_size, dtype='int64', overwrite=True)
+	zarr_data.create_dataset('info_near', data=info_near_arrays, chunks=total_sub_chunk_size, dtype='float32', overwrite=True)
+	zarr_data.create_dataset('info_grasp', data=info_grasp_arrays, chunks=total_sub_chunk_size, dtype='float32', overwrite=True)
 	zarr_data.create_dataset('img', data=img_arrays, chunks=img_chunk_size, dtype='uint8', overwrite=True, compressor=compressor)
 	zarr_data.create_dataset('state', data=state_arrays, chunks=state_chunk_size, dtype='float32', overwrite=True, compressor=compressor)
 	zarr_data.create_dataset('full_state', data=full_state_arrays, chunks=full_state_chunk_size, dtype='float32', overwrite=True, compressor=compressor)
@@ -173,10 +214,13 @@ def main(args):
 	cprint(f'state shape: {state_arrays.shape}, range: [{np.min(state_arrays)}, {np.max(state_arrays)}]', 'green')
 	cprint(f'full_state shape: {full_state_arrays.shape}, range: [{np.min(full_state_arrays)}, {np.max(full_state_arrays)}]', 'green')
 	cprint(f'action shape: {action_arrays.shape}, range: [{np.min(action_arrays)}, {np.max(action_arrays)}]', 'green')
+	cprint(f'info_near shape: {len(info_near_arrays)}', 'green')
+	cprint(f'info_grasp shape: {len(info_grasp_arrays)}', 'green')
+	cprint(f'total_subs shape: {len(total_subs)}', 'green')
 	cprint(f'Saved zarr file to {save_dir}', 'green')
 
 	# clean up
-	del img_arrays, state_arrays, point_cloud_arrays, action_arrays, episode_ends_arrays
+	del img_arrays, state_arrays, point_cloud_arrays, action_arrays, episode_ends_arrays, info_near_arrays,info_grasp_arrays,total_subs
 	del zarr_root, zarr_data, zarr_meta
 	del e
 

@@ -43,7 +43,12 @@ class SawyerBasketballEnvV2(SawyerXYZEnv):
             np.array(goal_low) + np.array([0, -0.083, 0.2499]),
             np.array(goal_high) + np.array([0, -0.083, 0.2501])
         )
-
+        # self.np_random, _ = seeding.np_random(None)
+        
+    # def seed(self, seed=None):
+    #     # 使用 Gym 的 seeding 工具来创建带种子的随机数生成器
+    #     self.np_random, seed = seeding.np_random(seed)
+        # return [seed]
     @property
     def model_name(self):
         return full_v2_path_for('sawyer_xyz/sawyer_basketball.xml')
@@ -60,10 +65,10 @@ class SawyerBasketballEnvV2(SawyerXYZEnv):
             grasp_reward,
             in_place_reward
         ) = self.compute_reward(action, obs)
-
+        NEAR_RADIUS=0.4
         info = {
             'success': float(obj_to_target <= self.TARGET_RADIUS),
-            'near_object': float(tcp_to_obj <= 0.05),
+            'near_object': float(tcp_to_obj <= NEAR_RADIUS),
             'grasp_success': float(
                 (tcp_open > 0) and
                 (obj[2] - 0.03 > self.obj_init_pos[2])
@@ -73,6 +78,12 @@ class SawyerBasketballEnvV2(SawyerXYZEnv):
             'obj_to_target': obj_to_target,
             'unscaled_reward': reward,
         }
+        print(f"tcp_to_obj: {tcp_to_obj}, near (NEAR_RADIUS): {NEAR_RADIUS}")
+        print(f"info: {info}")
+        # print("tcp_to_obj",tcp_to_obj)
+        # print("info",info)
+        # print("near",NEAR_RADIUS)
+        
 
         return reward, info
 
@@ -85,14 +96,19 @@ class SawyerBasketballEnvV2(SawyerXYZEnv):
     def _get_quat_objects(self):
         return self.sim.data.get_body_xquat('bsktball')
 
-    def reset_model(self):
+    def reset_model(self, seed = None):
+        # if seed is not None:
+        #     self.seed(seed)
+        
         self._reset_hand()
         self.prev_obs = self._get_curr_obs_combined_no_goal()
 
         basket_pos = self.goal.copy()
         self.sim.model.body_pos[self.model.body_name2id('basket_goal')] = basket_pos
         self._target_pos = self.data.site_xpos[self.model.site_name2id('goal')]
-
+        # print("self.random_init",self.random_init)
+        # self.random_init = False
+        # print("reset",self.random_init)
         if self.random_init:
             goal_pos = self._get_state_rand_vec()
             basket_pos = goal_pos[3:]

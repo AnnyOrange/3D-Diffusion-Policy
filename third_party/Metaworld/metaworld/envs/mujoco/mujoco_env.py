@@ -66,6 +66,7 @@ class MujocoEnv(gym.Env, abc.ABC):
         self.action_space.seed(seed)
         self.observation_space.seed(seed)
         self.goal_space.seed(seed)
+        print("seed",seed)
         return [seed]
 
     @abc.abstractmethod
@@ -85,7 +86,9 @@ class MujocoEnv(gym.Env, abc.ABC):
         pass
 
     @_assert_task_is_set
-    def reset(self):
+    def reset(self,seed = None):
+        if seed is not None:
+            self.seed(seed)
         self._did_see_sim_exception = False
         self.sim.reset()
         ob = self.reset_model()

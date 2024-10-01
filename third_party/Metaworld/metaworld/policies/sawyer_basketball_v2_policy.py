@@ -28,7 +28,8 @@ class SawyerBasketballV2Policy(Policy):
 
         action['delta_pos'] = move(o_d['hand_pos'], to_xyz=self._desired_pos(o_d), p=25.)
         action['grab_effort'] = self._grab_effort(o_d)
-
+        
+        # pos = self._desired_pos(o_d)
         return action.array
 
     @staticmethod

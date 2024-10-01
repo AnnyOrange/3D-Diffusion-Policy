@@ -6,7 +6,7 @@ import os
 import metaworld
 import random
 import time
-
+from gym.utils import seeding
 from natsort import natsorted
 from termcolor import cprint
 from gym import spaces
@@ -23,14 +23,16 @@ class MetaWorldEnv(gym.Env):
     def __init__(self, task_name, device="cuda:0", 
                  use_point_crop=True,
                  num_points=1024,
+                 seed = None
                  ):
         super(MetaWorldEnv, self).__init__()
-
+        # print("task_name",task_name)
         if '-v2' not in task_name:
             task_name = task_name + '-v2-goal-observable'
 
-        self.env = metaworld.envs.ALL_V2_ENVIRONMENTS_GOAL_OBSERVABLE[task_name]()
+        self.env = metaworld.envs.ALL_V2_ENVIRONMENTS_GOAL_OBSERVABLE[task_name](seed=seed)
         self.env._freeze_rand_vec = False
+        self.np_random, _ = seeding.np_random(seed)
 
         # https://arxiv.org/abs/2212.05698
         # self.env.sim.model.cam_pos[2] = [0.75, 0.075, 0.7]
@@ -201,7 +203,7 @@ class MetaWorldEnv(gym.Env):
         
         return obs_dict, reward, done, env_info
 
-    def reset(self):
+    def reset(self,seed = None):
         self.env.reset()
         self.env.reset_model()
         raw_obs = self.env.reset()
