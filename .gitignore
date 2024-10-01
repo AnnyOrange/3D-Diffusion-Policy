@@ -43,4 +43,8 @@ dexdeform_demonstrations.zip
 personal_TASK.md
 easytrain.sh
 nohup.out
+nano .gitignore
+nano .gitignore
 output/
+/3D-Diffusion-Policy/data/
+3D-Diffusion-Policy/data/
