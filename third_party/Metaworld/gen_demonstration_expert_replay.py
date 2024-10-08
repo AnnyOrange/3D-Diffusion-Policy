@@ -113,7 +113,7 @@ def main(args):
 	target_action = np.zeros(4)
 	sim_action = np.zeros(4)
 	save_dir_old = os.path.join(args.root_dir, 'metaworld_'+args.env_name+'_expert.zarr')
-	save_dir = os.path.join(args.root_dir, 'metaworld_'+args.env_name+f'_expert_method{method}speed{speed}.zarr')
+	save_dir = os.path.join(args.root_dir, 'metaworld_'+args.env_name+f'_expert_2x_speed.zarr')
 	seed = 73
 	if os.path.exists(save_dir):
 		cprint('Data already exists at {}'.format(save_dir), 'red')
@@ -263,8 +263,8 @@ def main(args):
 				# import pdb;pdb.set_trace()
 				# print(green_curve)
 				obs_dict, reward, done, info = e.step(sim_action,green_curve)
-				# if_near == True
-				# info['near_object']=0
+				if_near == True
+				info['near_object']=0
 				if quit(action_idx_episode_idx,total_sub[episode_idx]):
 					if if_near:
 						if info['near_object']==1:

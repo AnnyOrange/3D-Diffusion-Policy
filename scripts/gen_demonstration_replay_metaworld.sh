@@ -28,7 +28,33 @@
 #             "shelf-place" 
 #             "sweep-into" 
 #             "sweep")
-task_names=("reach")
+task_names=("basketball" "coffee-pull" "coffee-push" "bin-picking" "box-close" "soccer" "disassemble" "reach""box-close" "button-press-topdown" "button-press-topdown-wall" "button-press" "button-press-wall" "coffee-button" "dial-turn" "disassemble" "door-close" "door-lock" "door-open" "door-unlock" "hand-insert" "drawer-close" "drawer-open" 
+            "faucet-open" 
+            "faucet-close" 
+            "hammer" 
+            "handle-press-side" 
+            "handle-press" 
+            "handle-pull-side" 
+            "handle-pull" 
+            "lever-pull" 
+            "peg-insert-side" 
+            "pick-place-wall" 
+            "pick-out-of-hole" 
+            "push-back" 
+            "push" 
+            "pick-place" 
+            "plate-slide" 
+            "plate-slide-side" 
+            "plate-slide-back" 
+            "plate-slide-back-side" 
+            "peg-unplug-side" 
+            "stick-push" 
+            "stick-pull" 
+            "push-wall" 
+            "reach-wall" 
+            "shelf-place" 
+            "sweep-into" 
+            "sweep")
 
 # 进入指定目录
 cd third_party/Metaworld
@@ -43,15 +69,15 @@ do
     echo "Running task: ${task_name}"
 
     # 尝试不同的 speed 参数
-    for speed in 2 3 4
+    for speed in 2
     do
         echo "Running task: ${task_name} with speed: ${speed}"
 
         # 执行 Python 脚本，每个任务运行一次
-        python gen_demonstration_expert_replay.py --env_name=${task_name} \
+        python gen_demonstration_expert_replay2x.py --env_name=${task_name} \
             --num_episodes 20 \
             --root_dir "../../3D-Diffusion-Policy/data/" \
-            --method 3 \
+            --method 1 \
             --speed ${speed}
         
         # 检查上一个命令是否执行成功，如果失败则退出循环
