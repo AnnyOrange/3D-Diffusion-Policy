@@ -2,6 +2,9 @@
 
 # <a href="https://3d-diffusion-policy.github.io">3D Diffusion Policy</a>
 
+## demo-speedup
+
+
 <a href="https://3d-diffusion-policy.github.io"><strong>Project Page</strong></a>
   |
   <a href="https://arxiv.org/abs/2403.03954"><strong>arXiv</strong></a>
