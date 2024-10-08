@@ -2,6 +2,17 @@
 
 # <a href="https://3d-diffusion-policy.github.io">3D Diffusion Policy</a>
 
+## demo-speedup
+1.  Generate demonstrations by `gen_demonstration_metaworld.sh`. See the scripts for details.
+```bash
+bash scripts/gen_demonstration_metaworld.sh
+```
+2.  replay demonstrations by `gen_demonstration_replay_metaworld.sh`.
+```bash
+bash scripts/gen_demonstration_replay_metaworld.sh
+```
+For constant speed up, modify `if_near==True` and `info['near_object']=0` in gen_demonstration_expert_replay.py. (gen_demonstration_expert_replay2x is for saving the 2x demo for training)
+
 <a href="https://3d-diffusion-policy.github.io"><strong>Project Page</strong></a>
   |
   <a href="https://arxiv.org/abs/2403.03954"><strong>arXiv</strong></a>
@@ -15,6 +26,11 @@
   <a href="https://wang-muhan.github.io/">Muhan Wang</a>, 
   <a href="http://hxu.rocks/">Huazhe Xu</a>
 
+## 2x demo saving
+1. change scripts/gen_demonstration_replay_metaworld.sh `gen_demonstration_expert_replay.py` to `gen_demonstration_expert_replay2x.py`
+```bash
+bash scripts/gen_demonstration_replay_metaworld.sh
+```
 
 **Robotics: Science and Systems (RSS) 2024**
 
