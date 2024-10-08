@@ -74,37 +74,6 @@ def sim_to_action(sim_pos,current_obs,scale):
 	delta_action = (sim_pos-current_obs)/scale
 	return delta_action
 
-def speedup_norm(action_idx,target_pos_arrays,target_action,sim_pos_arrays,sim_action,green_curve,raw_state,scale,action):
-	target_pos = target_pos_arrays[action_idx]
-	# target_arrays.append(target_pos)
-	qaction=target_to_action(target_pos,raw_state[:3],scale)
-	target_action[:3] = qaction
-	target_action[3] = action[3]
-	sim_pos = sim_pos_arrays[action_idx]
-	# sim_qpos_arrays.append(sim_pos)
-	simaction = sim_to_action(sim_pos,raw_state[:3],scale)
-	sim_action[:3] = simaction 
-	sim_action[3] = action[3]
-	green_curve[:3] = target_pos_arrays[action_idx]
-	# green_curve[3] = action[3]
-	return target_action,sim_action,green_curve,target_pos,sim_pos
-def speedup_2x(action_idx,target_pos_arrays,target_action,sim_pos_arrays,sim_action,green_curve,raw_state,scale,action):
-	target_pos = target_pos_arrays[action_idx+1]
-	# target_arrays.append(target_pos)
-	qaction=target_to_action(target_pos,raw_state[:3],scale)
-	# print(len(action))
-	target_action[:3] = qaction
-	target_action[3] = action[3]
-	sim_pos = sim_pos_arrays[action_idx+1]
-	# sim_qpos_arrays.append(sim_pos)
-	simaction = sim_to_action(sim_pos,raw_state[:3],scale)
-	sim_action[:3] = simaction 
-	sim_action[3] = action[3]
-	green_curve[:3] = target_pos_arrays[action_idx+1]
-	# green_curve[3] = action[3]
- 
-	
-	return target_action,sim_action,green_curve,target_pos,sim_pos
 def main(args):
 	save_video = True
 	env_name = args.env_name
@@ -113,7 +82,7 @@ def main(args):
 	target_action = np.zeros(4)
 	sim_action = np.zeros(4)
 	save_dir_old = os.path.join(args.root_dir, 'metaworld_'+args.env_name+'_expert.zarr')
-	save_dir = os.path.join(args.root_dir, 'metaworld_'+args.env_name+f'_expert_2xspeed.zarr')
+	save_dir = os.path.join(args.root_dir, 'metaworld_'+args.env_name+f'_expert_2xspeeddemo.zarr')
 	seed = 73
 	if os.path.exists(save_dir):
 		cprint('Data already exists at {}'.format(save_dir), 'red')
@@ -191,7 +160,7 @@ def main(args):
 			
 			while not done:
 				
-				total_count_sub += 1
+				
 				
 				obs_img = obs_dict['image']
 				obs_robot_state = obs_dict['agent_pos']
@@ -217,21 +186,39 @@ def main(args):
 				# qpos_sub.append(qpos)
 				apos_gripper_sub.append(raw_state[3])
 				# qpos_gripper_sub.append(qpos_gripper)
-				action_idx_episode_idx+=2
+				
 				# import pdb;pdb.set_trace()
 				# print(green_curve)
-
+				
+				if total_sub[episode_idx]<=action_idx_episode_idx:
+					print("total_sub[episode_idx]",total_sub[episode_idx])
+					print("total_count_sub",total_count_sub)
+					print("action_idx",action_idx)
+					break
 				action1 = action_data[action_idx]
+				action_idx+=1
 				action1 = np.clip(action1, -1, 1)
-
-				action2 = action_data[action_idx+1]
+				action_idx_episode_idx+=1
+				
+				
+				if total_sub[episode_idx]<=action_idx_episode_idx:
+					print("total_sub[episode_idx]",total_sub[episode_idx])
+					print("total_count_sub",total_count_sub)
+					print("action_idx",action_idx)
+					break
+				action2 = action_data[action_idx]
+				action_idx+=1
 				action2 = np.clip(action2, -1, 1)
+				action_idx_episode_idx+=1
 				action_2x = action1+action2
-				action_2x[-1] = action1[-1]
+				action_2x[-1] = action_data[action_idx-2][-1]
+				# print(action_2x)
 				action_arrays_sub.append(action_2x)
 				green_curve=None
 				obs_dict, reward, done, info = e.step(action_2x,green_curve)
-				action_idx+=2
+				total_count_sub += 1
+				# import pdb;pdb.set_trace()
+				
 				
 				# print(info)
 				# print("info",info)
@@ -242,13 +229,7 @@ def main(args):
 				ep_success = ep_success or info['success']
 				ep_success_times += info['success']
 
-				if total_sub[episode_idx]<=action_idx_episode_idx:
-					print("total_sub[episode_idx]",total_sub[episode_idx])
-					print("total_count_sub",total_count_sub)
-					# total_count+=total_count_sub
-					# print(action)
-					# raw_state_log.write(f'{episode_idx}: last_action = {action.tolist()}\n')s
-					break
+				
 				if done:
 					print("done")
 					print("total_sub",total_count_sub)
@@ -310,6 +291,8 @@ def main(args):
 	# print(len(qpos_arrays))
 	start = 0
 	print(len(info['target_pos']))
+	save_path = os.path.join(save_dir, 'target_pos.npy')
+	np.save(save_path, info['target_pos'])
 	for idx in range(num_episodes):
 	# 	target_pos_sub = info['target_pos'][start:start+new_count[idx]]
 	# 	sim_pos_sub = sim_qpos_arrays[start:start+new_count[idx]]
