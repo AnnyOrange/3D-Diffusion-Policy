@@ -4,11 +4,11 @@
 
 ## demo-speedup
 1.  Generate demonstrations by `gen_demonstration_metaworld.sh`. See the scripts for details.
-```python
+```bash
 bash scripts/gen_demonstration_metaworld.sh
 ```
 2.  replay demonstrations by `gen_demonstration_replay_metaworld.sh`.
-```python
+```bash
 bash scripts/gen_demonstration_replay_metaworld.sh
 ```
 
