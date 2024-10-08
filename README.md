@@ -26,6 +26,11 @@ For constant speed up, modify `if_near==True` and `info['near_object']=0` in gen
   <a href="https://wang-muhan.github.io/">Muhan Wang</a>, 
   <a href="http://hxu.rocks/">Huazhe Xu</a>
 
+## 2x demo saving
+1. change scripts/gen_demonstration_replay_metaworld.sh `gen_demonstration_expert_replay.py` to `gen_demonstration_expert_replay2x.py`
+```bash
+bash scripts/gen_demonstration_replay_metaworld.sh
+```
 
 **Robotics: Science and Systems (RSS) 2024**
 
