@@ -3,7 +3,14 @@
 # <a href="https://3d-diffusion-policy.github.io">3D Diffusion Policy</a>
 
 ## demo-speedup
-
+1.  Generate demonstrations by `gen_demonstration_metaworld.sh`. See the scripts for details.
+```python
+bash scripts/gen_demonstration_metaworld.sh
+```
+2.  replay demonstrations by `gen_demonstration_replay_metaworld.sh`.
+```python
+bash scripts/gen_demonstration_replay_metaworld.sh
+```
 
 <a href="https://3d-diffusion-policy.github.io"><strong>Project Page</strong></a>
   |
