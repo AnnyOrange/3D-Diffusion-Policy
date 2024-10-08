@@ -33,8 +33,13 @@ class SimpleVideoRecordingWrapper(gym.Wrapper):
         self.step_count = 1
         return obs
     
-    def step(self, action):
-        result = super().step(action)
+    def step(self, action,green_curve=None):
+        if green_curve is None:
+            result = super().step(action)
+        else:
+            result = super().step(action,green_curve)
+        # result = super().step(action,green_curve)
+        # result = super().step(action)
         self.step_count += 1
         
         frame = self.env.render(mode=self.mode)

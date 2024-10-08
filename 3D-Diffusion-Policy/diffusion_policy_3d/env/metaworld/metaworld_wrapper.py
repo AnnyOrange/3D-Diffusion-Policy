@@ -178,9 +178,12 @@ class MetaWorldEnv(gym.Env):
         return obs_dict
             
             
-    def step(self, action: np.array):
-
-        raw_state, reward, done, env_info = self.env.step(action)
+    def step(self, action: np.array, green_curve = None):
+        if green_curve is None:
+            # print("no green_curve")
+            raw_state, reward, done, env_info = self.env.step(action)
+        else:
+            raw_state, reward, done, env_info = self.env.step(action,green_curve)
         self.cur_step += 1
 
 
@@ -198,7 +201,7 @@ class MetaWorldEnv(gym.Env):
             'point_cloud': point_cloud,
             'full_state': raw_state,
         }
-
+        # print("self.cur_step",self.cur_step)
         done = done or self.cur_step >= self.episode_length
         
         return obs_dict, reward, done, env_info

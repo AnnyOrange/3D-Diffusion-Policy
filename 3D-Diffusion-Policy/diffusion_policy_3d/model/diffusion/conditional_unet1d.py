@@ -114,6 +114,7 @@ class ConditionalResidualBlock1D(nn.Module):
         out = self.blocks[0](x)  
         if cond is not None:      
             if self.condition_type == 'film':
+                print(cond.shape)
                 embed = self.cond_encoder(cond)
                 embed = embed.reshape(embed.shape[0], 2, self.out_channels, 1)
                 scale = embed[:, 0, ...]

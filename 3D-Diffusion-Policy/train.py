@@ -70,7 +70,7 @@ class TrainDP3Workspace:
 
     def run(self):
         cfg = copy.deepcopy(self.cfg)
-        
+        print(cfg)
         if cfg.training.debug:
             cfg.training.num_epochs = 100
             cfg.training.max_train_steps = 10
@@ -88,10 +88,12 @@ class TrainDP3Workspace:
             verbose = False
         
         RUN_VALIDATION = False # reduce time cost
-        
+        print(cfg.training.resume)
         # resume training
+        cfg.training.resume = False
         if cfg.training.resume:
             lastest_ckpt_path = self.get_checkpoint_path()
+            print(lastest_ckpt_path)
             if lastest_ckpt_path.is_file():
                 print(f"Resuming from checkpoint {lastest_ckpt_path}")
                 self.load_checkpoint(path=lastest_ckpt_path)
@@ -99,6 +101,7 @@ class TrainDP3Workspace:
         # configure dataset
         dataset: BaseDataset
         dataset = hydra.utils.instantiate(cfg.task.dataset)
+        
 
         assert isinstance(dataset, BaseDataset), print(f"dataset must be BaseDataset, got {type(dataset)}")
         train_dataloader = DataLoader(dataset, **cfg.dataloader)
