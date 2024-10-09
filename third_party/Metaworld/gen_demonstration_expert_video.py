@@ -260,6 +260,9 @@ def main(args):
 			else:
 				qpos_apos(apos_sub,qpos_sub,save_dir,episode_idx)
 				total_count += total_count_sub
+				print("total_count",total_count)
+				print("len(img_arrays_sub)",len(img_arrays_sub))
+				print("action_arrays_sub",len(action_arrays_sub))
 				episode_ends_arrays.append(copy.deepcopy(total_count)) # the index of the last step of the episode    
 				img_arrays.extend(copy.deepcopy(img_arrays_sub))
 				point_cloud_arrays.extend(copy.deepcopy(point_cloud_arrays_sub))

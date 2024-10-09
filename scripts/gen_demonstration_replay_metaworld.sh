@@ -1,34 +1,7 @@
 # bash scripts/gen_demonstration_metaworld.sh basketball
 # task_names=("basketball" "coffee-pull" "coffee-push" "bin-picking" "box-close" "soccer" "disassemble" "reach")
 # task_names=("disassemble" "reach")
-# task_names=("box-close" "button-press-topdown" "button-press-topdown-wall" "button-press" "button-press-wall" "coffee-button" "dial-turn" "disassemble" "door-close" "door-lock" "door-open" "door-unlock" "hand-insert" "drawer-close" "drawer-open" 
-#             "faucet-open" 
-#             "faucet-close" 
-#             "hammer" 
-#             "handle-press-side" 
-#             "handle-press" 
-#             "handle-pull-side" 
-#             "handle-pull" 
-#             "lever-pull" 
-#             "peg-insert-side" 
-#             "pick-place-wall" 
-#             "pick-out-of-hole" 
-#             "push-back" 
-#             "push" 
-#             "pick-place" 
-#             "plate-slide" 
-#             "plate-slide-side" 
-#             "plate-slide-back" 
-#             "plate-slide-back-side" 
-#             "peg-unplug-side" 
-#             "stick-push" 
-#             "stick-pull" 
-#             "push-wall" 
-#             "reach-wall" 
-#             "shelf-place" 
-#             "sweep-into" 
-#             "sweep")
-task_names=("basketball" "coffee-pull" "coffee-push" "bin-picking" "box-close" "soccer" "disassemble" "reach""box-close" "button-press-topdown" "button-press-topdown-wall" "button-press" "button-press-wall" "coffee-button" "dial-turn" "disassemble" "door-close" "door-lock" "door-open" "door-unlock" "hand-insert" "drawer-close" "drawer-open" 
+task_names=("coffee-pull" "coffee-push" "bin-picking" "box-close" "soccer" "disassemble" "reach" "button-press-topdown" "button-press-topdown-wall" "button-press" "button-press-wall" "coffee-button" "dial-turn" "disassemble" "door-close" "door-lock" "door-open" "door-unlock" "hand-insert" "drawer-close" "drawer-open" 
             "faucet-open" 
             "faucet-close" 
             "hammer" 
@@ -55,6 +28,7 @@ task_names=("basketball" "coffee-pull" "coffee-push" "bin-picking" "box-close" "
             "shelf-place" 
             "sweep-into" 
             "sweep")
+
 
 # 进入指定目录
 cd third_party/Metaworld

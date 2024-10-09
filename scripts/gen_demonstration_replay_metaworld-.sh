@@ -1,7 +1,7 @@
 # bash scripts/gen_demonstration_metaworld.sh basketball
 # task_names=("basketball" "coffee-pull" "coffee-push" "bin-picking" "box-close" "soccer" "disassemble" "reach")
 # task_names=("disassemble" "reach")
-task_names=()
+task_names=("dial-turn" "door-lock" "door-open" "door-unlock" "handle-pull-side" "lever-pull" "pegunplugside" "basketball" "bin-picking" "coffee-pull" "coffee-push" "hammer" "soccer" "sweep" "sweep-into" "hand-insert" "pick-out-of-hole" "pick-place" "push" "push-back" "shelf-place" "stick-pull" "stick-push" "pick-place-wall") 
 
 # 进入指定目录
 cd third_party/Metaworld
@@ -24,7 +24,7 @@ do
         python gen_demonstration_expert_replay.py --env_name=${task_name} \
             --num_episodes 20 \
             --root_dir "../../3D-Diffusion-Policy/data/" \
-            --method 3 \
+            --method 4 \
             --speed ${speed}
         
         # 检查上一个命令是否执行成功，如果失败则退出循环

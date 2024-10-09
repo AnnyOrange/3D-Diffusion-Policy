@@ -151,6 +151,13 @@ def main(args):
 		if_near = False
 		if_near_grasp = False
 		if_grasp = True
+	elif method == 4:
+		if_near_wait = True
+		if_near = False
+		if_near_grasp = False
+		if_grasp = False
+		nmax = 6
+  
 		# action_data,total_sub,avg_speed= process_all_episodes(action_data,info_near_data,info_grasp_data, total_sub,if_near = False,if_near_grasp = True)
 	
 
@@ -226,6 +233,7 @@ def main(args):
 			sim_action[3] = action[3]
 
 			green_curve = target_pos_arrays[action_idx]
+			ntim = 0
 			action_idx += 1
 			while not done:
 				
@@ -263,8 +271,8 @@ def main(args):
 				# import pdb;pdb.set_trace()
 				# print(green_curve)
 				obs_dict, reward, done, info = e.step(sim_action,green_curve)
-				if_near == True
-				info['near_object']=0
+				# if_near == True
+				# info['near_object']=0
 				if quit(action_idx_episode_idx,total_sub[episode_idx]):
 					if if_near:
 						if info['near_object']==1:
@@ -507,6 +515,85 @@ def main(args):
 									target_action,sim_action,green_curve,target_pos,sim_pos = speedup_norm(action_idx,target_pos_arrays,target_action,sim_pos_arrays,sim_action,green_curve,raw_state,scale,action)
 									# target_arrays.append(target_pos)
 						action_idx+=1
+					elif if_near_wait is True:
+						if info['near_object']==1 and ntim<nmax:
+							ntim +=1
+							action = action_data[action_idx]
+							target_action,sim_action,green_curve,target_pos,sim_pos = speedup_norm(action_idx,target_pos_arrays,target_action,sim_pos_arrays,sim_action,green_curve,raw_state,scale,action)
+						else:
+							if (speed == 2):
+								if quit(action_idx_episode_idx+1,total_sub[episode_idx]):
+									action = action_data[action_idx]+action_data[action_idx+1]
+									action[3] = action_data[action_idx][3]
+									target_action,sim_action,green_curve,target_pos,sim_pos = speedup_2x(action_idx,target_pos_arrays,target_action,sim_pos_arrays,sim_action,green_curve,raw_state,scale,action)
+									# print("action[3]",action[3])
+									# target_arrays.append(target_pos)
+									# sim_qpos_arrays.append(sim_pos)	
+									action_idx+=1
+									action_idx_episode_idx+=1
+								else:
+									action = action_data[action_idx]
+									target_action,sim_action,green_curve,target_pos,sim_pos = speedup_norm(action_idx,target_pos_arrays,target_action,sim_pos_arrays,sim_action,green_curve,raw_state,scale,action)
+									# target_arrays.append(target_pos)
+									# sim_qpos_arrays.append(sim_pos)
+							if (speed == 3):
+								if quit(action_idx_episode_idx+2,total_sub[episode_idx]):
+									action = action_data[action_idx]+action_data[action_idx+1]+action_data[action_idx+2]
+									action[3] = action_data[action_idx][3]
+									target_action,sim_action,green_curve,target_pos,sim_pos = speedup_2x(action_idx+1,target_pos_arrays,target_action,sim_pos_arrays,sim_action,green_curve,raw_state,scale,action)
+									# print("action[3]",action[3])
+									# target_arrays.append(target_pos)
+									# sim_qpos_arrays.append(sim_pos)	
+									action_idx+=2
+									action_idx_episode_idx+=2
+								elif quit(action_idx_episode_idx+1,total_sub[episode_idx]):
+									action = action_data[action_idx]+action_data[action_idx+1]
+									action[3] = action_data[action_idx][3]
+									target_action,sim_action,green_curve,target_pos,sim_pos = speedup_2x(action_idx,target_pos_arrays,target_action,sim_pos_arrays,sim_action,green_curve,raw_state,scale,action)
+									# print("action[3]",action[3])
+									# target_arrays.append(target_pos)
+									# sim_qpos_arrays.append(sim_pos)	
+									action_idx+=1
+									action_idx_episode_idx+=1
+								else:
+									action = action_data[action_idx]
+									target_action,sim_action,green_curve,target_pos,sim_pos = speedup_norm(action_idx,target_pos_arrays,target_action,sim_pos_arrays,sim_action,green_curve,raw_state,scale,action)
+									# target_arrays.append(target_pos)
+									# sim_qpos_arrays.append(sim_pos)
+							elif (speed == 4):
+								if quit(action_idx_episode_idx+3,total_sub[episode_idx]):
+									action = action_data[action_idx]+action_data[action_idx+1]+action_data[action_idx+2]+action_data[action_idx+3]
+									action[3] = action_data[action_idx][3]
+									target_action,sim_action,green_curve,target_pos,sim_pos = speedup_2x(action_idx+2,target_pos_arrays,target_action,sim_pos_arrays,sim_action,green_curve,raw_state,scale,action)
+									# print("action[3]",action[3])
+									# target_arrays.append(target_pos)
+									# sim_qpos_arrays.append(sim_pos)	
+									action_idx+=3
+									action_idx_episode_idx+=3
+								elif quit(action_idx_episode_idx+2,total_sub[episode_idx]):
+									action = action_data[action_idx]+action_data[action_idx+1]+action_data[action_idx+2]
+									action[3] = action_data[action_idx][3]
+									target_action,sim_action,green_curve,target_pos,sim_pos = speedup_2x(action_idx+1,target_pos_arrays,target_action,sim_pos_arrays,sim_action,green_curve,raw_state,scale,action)
+									# print("action[3]",action[3])
+									# target_arrays.append(target_pos)
+									# sim_qpos_arrays.append(sim_pos)	
+									action_idx+=2
+									action_idx_episode_idx+=2
+								elif quit(action_idx_episode_idx+1,total_sub[episode_idx]):
+									action = action_data[action_idx]+action_data[action_idx+1]
+									action[3] = action_data[action_idx][3]
+									target_action,sim_action,green_curve,target_pos,sim_pos = speedup_2x(action_idx,target_pos_arrays,target_action,sim_pos_arrays,sim_action,green_curve,raw_state,scale,action)
+									# print("action[3]",action[3])
+									# target_arrays.append(target_pos)
+									# sim_qpos_arrays.append(sim_pos)	
+									action_idx+=1
+									action_idx_episode_idx+=1
+								else:
+									action = action_data[action_idx]
+									target_action,sim_action,green_curve,target_pos,sim_pos = speedup_norm(action_idx,target_pos_arrays,target_action,sim_pos_arrays,sim_action,green_curve,raw_state,scale,action)
+									# target_arrays.append(target_pos)
+						action_idx+=1	
+
 					else:
 						action = action_data[action_idx]
 						target_action,sim_action,green_curve,target_pos,sim_pos = speedup_norm(action_idx,target_pos_arrays,target_action,sim_pos_arrays,sim_action,green_curve,raw_state,scale,action)

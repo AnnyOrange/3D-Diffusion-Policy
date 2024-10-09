@@ -159,9 +159,11 @@ def main(args):
 			action_idx_episode_idx = 0
 			
 			while not done:
-				
-				
-				
+				if total_sub[episode_idx]<=action_idx_episode_idx:
+					print("total_sub[episode_idx]",total_sub[episode_idx])
+					print("total_count_sub",total_count_sub)
+					print("action_idx",action_idx)
+					break
 				obs_img = obs_dict['image']
 				obs_robot_state = obs_dict['agent_pos']
 				obs_point_cloud = obs_dict['point_cloud']
@@ -175,10 +177,6 @@ def main(args):
 				full_state_arrays_sub.append(raw_state)
 				
 				# action = mw_policy.get_action(raw_state)
-				
-				
-				
-				
 				# qpos = sim_action[:3]/100+raw_state[:3]
 				# qpos = action[:3]+raw_state[:3]
 				# print("raw_state",raw_state[:3])
@@ -190,11 +188,7 @@ def main(args):
 				# import pdb;pdb.set_trace()
 				# print(green_curve)
 				
-				if total_sub[episode_idx]<=action_idx_episode_idx:
-					print("total_sub[episode_idx]",total_sub[episode_idx])
-					print("total_count_sub",total_count_sub)
-					print("action_idx",action_idx)
-					break
+				
 				action1 = action_data[action_idx]
 				action_idx+=1
 				action1 = np.clip(action1, -1, 1)
@@ -235,7 +229,7 @@ def main(args):
 					print("total_sub",total_count_sub)
 					# total_count+=total_count_sub
 					break
-			total_count+=total_count_sub
+			
 			new_count.append(total_count_sub)
 			all_success_rates.append(ep_success)
 			all_traj_rewards.append(ep_reward)
@@ -254,17 +248,19 @@ def main(args):
 			# print("len(action)",len(action_arrays_sub))
 			if not ep_success or ep_success_times < 5:
 				cprint(f'Episode: {episode_idx} failed with reward {ep_reward} and success times {ep_success_times}', 'red')
-				episode_ends_arrays.append(copy.deepcopy(total_count)) # the index of the last step of the episode    
-				img_arrays.extend(copy.deepcopy(img_arrays_sub))
-				point_cloud_arrays.extend(copy.deepcopy(point_cloud_arrays_sub))
-				depth_arrays.extend(copy.deepcopy(depth_arrays_sub))
-				state_arrays.extend(copy.deepcopy(state_arrays_sub))
-				action_arrays.extend(copy.deepcopy(action_arrays_sub))
-				full_state_arrays.extend(copy.deepcopy(full_state_arrays_sub))
+				# episode_ends_arrays.append(copy.deepcopy(total_count)) # the index of the last step of the episode    
+				# img_arrays.extend(copy.deepcopy(img_arrays_sub))
+				# point_cloud_arrays.extend(copy.deepcopy(point_cloud_arrays_sub))
+				# depth_arrays.extend(copy.deepcopy(depth_arrays_sub))
+				# state_arrays.extend(copy.deepcopy(state_arrays_sub))
+				# action_arrays.extend(copy.deepcopy(action_arrays_sub))
+				# full_state_arrays.extend(copy.deepcopy(full_state_arrays_sub))
 				episode_idx += 1
 			else:
-				# total_count += total_count_sub
-				
+				total_count += total_count_sub
+				print("total_count",total_count)
+				print("len(img_arrays_sub)",len(img_arrays_sub))
+				print("action_arrays_sub",len(action_arrays_sub))
 				episode_ends_arrays.append(copy.deepcopy(total_count)) # the index of the last step of the episode    
 				img_arrays.extend(copy.deepcopy(img_arrays_sub))
 				point_cloud_arrays.extend(copy.deepcopy(point_cloud_arrays_sub))
