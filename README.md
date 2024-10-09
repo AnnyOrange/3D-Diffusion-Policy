@@ -13,7 +13,7 @@ bash scripts/gen_demonstration_replay_metaworld.sh
 ```
 For constant speed up, modify `if_near==True` and `info['near_object']=0` in gen_demonstration_expert_replay.py. (gen_demonstration_expert_replay2x is for saving the 2x demo for training)
 
-For demo that use for training.
+For demo that use for training. 
 ```bash
 bash scripts/gen_demonstration_replay_metaworld-.sh
 ```
