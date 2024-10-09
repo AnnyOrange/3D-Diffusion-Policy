@@ -69,7 +69,7 @@ def save_video_to_file(videos, save_path, fps=10):
     # print(f"Video saved at {save_path}")
 def speed2x(action_data,action_idx):
 	action = np.clip(action_data[action_idx],-1,1)+np.clip(action_data[action_idx+1],-1,1)
- 	action[3] = action_data[action_idx][3]
+	action[3] = action_data[action_idx][3]
 	return action
 
 def speed3x(action_data,action_idx):
@@ -79,7 +79,7 @@ def speed3x(action_data,action_idx):
 
 def speed4x(action_data,action_idx):
 	action = np.clip(action_data[action_idx],-1,1)+np.clip(action_data[action_idx+1],-1,1)+np.clip(action_data[action_idx+2],-1,1)+np.clip(action_data[action_idx+3],-1,1)
- 	action[3] = action_data[action_idx+2][3]
+	action[3] = action_data[action_idx+2][3]
 	return action
 
 def main(args):
@@ -102,7 +102,7 @@ def main(args):
 			cprint('Exiting', 'red')
 			return
 	os.makedirs(save_dir, exist_ok=True)
-	action_data,-,-,total_sub,-,- = load_mw_data(save_dir_old)
+	action_data,_,_,total_sub,_,_ = load_mw_data(save_dir_old)
 	# print(len(target_pos_arrays))
 	# import pdb;pdb.set_trace()
 
@@ -167,7 +167,6 @@ def main(args):
 
 	# mw_policy = load_mw_policy(env_name)
 	# print(mw_policy)
-
 	# loop over episodes
 	raw_state_file = os.path.join(save_dir, 'raw_state.txt')
 	with open(raw_state_file, 'a') as raw_state_log:
@@ -198,9 +197,30 @@ def main(args):
 			qpos_gripper_sub = []
 			action_idx_episode_idx = 1
 			action = action_data[action_idx]
-			
+			action_idx+=1
 			ntim = 0
 			while not done:
+ 
+				total_count_sub += 1
+				
+				obs_img = obs_dict['image']
+				obs_robot_state = obs_dict['agent_pos']
+				obs_point_cloud = obs_dict['point_cloud']
+				obs_depth = obs_dict['depth']
+	
+
+				img_arrays_sub.append(obs_img)
+				point_cloud_arrays_sub.append(obs_point_cloud)
+				depth_arrays_sub.append(obs_depth)
+				state_arrays_sub.append(obs_robot_state)
+				full_state_arrays_sub.append(raw_state)
+				
+				# action = mw_policy.get_action(raw_state)
+				
+				action_arrays_sub.append(action)
+				obs_dict, reward, done, info = e.step(action)
+				action_idx_episode_idx+=1
+    
 				if quit(action_idx_episode_idx,total_sub[episode_idx]):
 					if if_near:
 						if info['near_object']==1:
@@ -323,10 +343,9 @@ def main(args):
 									action = action_data[action_idx]
 						action_idx+=1
 					elif if_near_wait is True:
-						if info['near_object']==1 and ntim<nmax:
+						if (info['near_object']==1) and (ntim<nmax):
 							ntim +=1
 							action = action_data[action_idx]
-							target_action,sim_action,green_curve,target_pos,sim_pos = speedup_norm(action_idx,target_pos_arrays,target_action,sim_pos_arrays,sim_action,green_curve,raw_state,scale,action)
 						else:
 							if (speed == 2):
 								if quit(action_idx_episode_idx+1,total_sub[episode_idx]):
@@ -370,31 +389,10 @@ def main(args):
 				else:
 					print(total_count_sub)
 					break
- 
-				total_count_sub += 1
-				
-				obs_img = obs_dict['image']
-				obs_robot_state = obs_dict['agent_pos']
-				obs_point_cloud = obs_dict['point_cloud']
-				obs_depth = obs_dict['depth']
-	
-
-				img_arrays_sub.append(obs_img)
-				point_cloud_arrays_sub.append(obs_point_cloud)
-				depth_arrays_sub.append(obs_depth)
-				state_arrays_sub.append(obs_robot_state)
-				full_state_arrays_sub.append(raw_state)
-				
-				# action = mw_policy.get_action(raw_state)
-				
-				action_arrays_sub.append(action)
 				# qpos = action[:3]+raw_state[:3]
 				# print("raw_state",raw_state[:3])
 				
-				action_idx_episode_idx+=1
-				# import pdb;pdb.set_trace()
-				# print(green_curve)
-				obs_dict, reward, done, info = e.step(action)
+				
 				# if_near == True
 				# info['near_object']=0
 				
@@ -439,7 +437,9 @@ def main(args):
 				episode_idx += 1
 			else:
 				total_count += total_count_sub
-				
+				print(total_count)
+				print(len(img_arrays_sub))
+				print(len(action_arrays_sub))
 				episode_ends_arrays.append(copy.deepcopy(total_count)) # the index of the last step of the episode    
 				img_arrays.extend(copy.deepcopy(img_arrays_sub))
 				point_cloud_arrays.extend(copy.deepcopy(point_cloud_arrays_sub))
@@ -462,7 +462,6 @@ def main(args):
 	with open(log_file_path, 'w') as f:
 		for key, value in log_data.items():
 			f.write(f"{key}: {value}\n")
-	n_groups = qpos.shape[-1]
 	# print(len(qpos_arrays))
 	start = 0
 	# print(len(info['target_pos']))

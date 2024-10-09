@@ -1,7 +1,7 @@
 # bash scripts/gen_demonstration_metaworld.sh basketball
 # task_names=("basketball" "coffee-pull" "coffee-push" "bin-picking" "box-close" "soccer" "disassemble" "reach")
 # task_names=("disassemble" "reach")
-task_names=("dial-turn" "door-lock" "door-open" "door-unlock" "handle-pull-side" "lever-pull" "pegunplugside" "basketball" "bin-picking" "coffee-pull" "coffee-push" "hammer" "soccer" "sweep" "sweep-into" "hand-insert" "pick-out-of-hole" "pick-place" "push" "push-back" "shelf-place" "stick-pull" "stick-push" "pick-place-wall") 
+task_names=("basketball" "dial-turn" "door-lock" "door-open" "door-unlock" "handle-pull-side" "lever-pull" "pegunplugside" "bin-picking" "coffee-pull" "coffee-push" "hammer" "soccer" "sweep" "sweep-into" "hand-insert" "pick-out-of-hole" "pick-place" "push" "push-back" "shelf-place" "stick-pull" "stick-push" "pick-place-wall") 
 
 # 进入指定目录
 cd third_party/Metaworld
@@ -21,7 +21,7 @@ do
         echo "Running task: ${task_name} with speed: ${speed}"
 
         # 执行 Python 脚本，每个任务运行一次
-        python gen_demonstration_expert_replay.py --env_name=${task_name} \
+        python gen_demonstration_expert_replay-demo.py --env_name=${task_name} \
             --num_episodes 20 \
             --root_dir "../../3D-Diffusion-Policy/data/" \
             --method 4 \
