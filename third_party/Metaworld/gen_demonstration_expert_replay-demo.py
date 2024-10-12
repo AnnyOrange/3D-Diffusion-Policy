@@ -87,10 +87,13 @@ def main(args):
 	env_name = args.env_name
 	method = args.method
 	speed = args.speed
+	nmax = args.nmax
 	target_action = np.zeros(4)
 	sim_action = np.zeros(4)
 	save_dir_old = os.path.join(args.root_dir, 'metaworld_'+args.env_name+'_expert.zarr')
-	save_dir = os.path.join(args.root_dir, 'metaworld_'+args.env_name+f'_expert_method{method}speed{speed}.zarr')
+	save_up = os.path.join(args.root_dir, 'metaworld_training')
+	os.makedirs(save_up, exist_ok=True)
+	save_dir = os.path.join(save_up, f'metaworld_{args.env_name}_expert_method.zarr')
 	seed = 73
 	if os.path.exists(save_dir):
 		cprint('Data already exists at {}'.format(save_dir), 'red')
@@ -125,7 +128,7 @@ def main(args):
 		if_near_grasp = True
 		if_grasp = False
 		if_near_wait = False
-	elif method ==3:
+	elif method == 3:
 		if_near = False
 		if_near_grasp = False
 		if_grasp = True
@@ -135,7 +138,7 @@ def main(args):
 		if_near = False
 		if_near_grasp = False
 		if_grasp = False
-		nmax = 6
+		
   
 		# action_data,total_sub,avg_speed= process_all_episodes(action_data,info_near_data,info_grasp_data, total_sub,if_near = False,if_near_grasp = True)
 	
@@ -196,7 +199,7 @@ def main(args):
 			apos_gripper_sub = []
 			qpos_gripper_sub = []
 			action_idx_episode_idx = 1
-			action = action_data[action_idx]
+			action = np.clip(action_data[action_idx],-1,1)
 			action_idx+=1
 			ntim = 0
 			while not done:
@@ -224,7 +227,7 @@ def main(args):
 				if quit(action_idx_episode_idx,total_sub[episode_idx]):
 					if if_near:
 						if info['near_object']==1:
-							action = action_data[action_idx]
+							action = np.clip(action_data[action_idx],-1,1)
 						else:
 							# speed倍速
 							# print("speedup")
@@ -234,7 +237,7 @@ def main(args):
 									action_idx+=1
 									action_idx_episode_idx+=1
 								else:
-									action = action_data[action_idx]
+									action = np.clip(action_data[action_idx],-1,1)
 							elif (speed == 3):
 								if quit(action_idx_episode_idx+2,total_sub[episode_idx]):
 									action = speed3x(action_data,action_idx)
@@ -245,7 +248,7 @@ def main(args):
 									action_idx+=1
 									action_idx_episode_idx+=1
 								else:
-									action = action_data[action_idx]
+									action = np.clip(action_data[action_idx],-1,1)
 									
 							elif (speed == 4):
 								if quit(action_idx_episode_idx+3,total_sub[episode_idx]):
@@ -261,12 +264,12 @@ def main(args):
 									action_idx+=1
 									action_idx_episode_idx+=1
 								else:
-									action = action_data[action_idx]
+									action = np.clip(action_data[action_idx],-1,1)
 									
 						action_idx+=1
 					elif if_near_grasp:
 						if info['near_object']==True and info['grasp_success']==False:
-							action = action_data[action_idx]
+							action = np.clip(action_data[action_idx],-1,1)
 						else:
 							if (speed == 2):
 								if quit(action_idx_episode_idx+1,total_sub[episode_idx]):
@@ -285,7 +288,7 @@ def main(args):
 									action_idx+=1
 									action_idx_episode_idx+=1
 								else:
-									action = action_data[action_idx]
+									action = np.clip(action_data[action_idx],-1,1)
 									
 							elif (speed == 4):
 								if quit(action_idx_episode_idx+3,total_sub[episode_idx]):
@@ -301,11 +304,11 @@ def main(args):
 									action_idx+=1
 									action_idx_episode_idx+=1
 								else:
-									action = action_data[action_idx]
+									action = np.clip(action_data[action_idx],-1,1)
 						action_idx+=1
 					elif if_grasp:
 						if info['grasp_success'] == False:
-							action = action_data[action_idx]
+							action = np.clip(action_data[action_idx],-1,1)
 						else:
 							if (speed == 2):
 								if quit(action_idx_episode_idx+1,total_sub[episode_idx]):
@@ -313,7 +316,7 @@ def main(args):
 									action_idx+=1
 									action_idx_episode_idx+=1
 								else:
-									action = action_data[action_idx]
+									action = np.clip(action_data[action_idx],-1,1)
 							elif (speed == 3):
 								if quit(action_idx_episode_idx+2,total_sub[episode_idx]):
 									action = speed3x(action_data,action_idx)
@@ -324,7 +327,7 @@ def main(args):
 									action_idx+=1
 									action_idx_episode_idx+=1
 								else:
-									action = action_data[action_idx]
+									action = np.clip(action_data[action_idx],-1,1)
 									
 							elif (speed == 4):
 								if quit(action_idx_episode_idx+3,total_sub[episode_idx]):
@@ -340,12 +343,13 @@ def main(args):
 									action_idx+=1
 									action_idx_episode_idx+=1
 								else:
-									action = action_data[action_idx]
+									action = np.clip(action_data[action_idx],-1,1)
 						action_idx+=1
 					elif if_near_wait is True:
 						if (info['near_object']==1) and (ntim<nmax):
+							print("ntim",ntim)
 							ntim +=1
-							action = action_data[action_idx]
+							action = np.clip(action_data[action_idx],-1,1)
 						else:
 							if (speed == 2):
 								if quit(action_idx_episode_idx+1,total_sub[episode_idx]):
@@ -353,7 +357,7 @@ def main(args):
 									action_idx+=1
 									action_idx_episode_idx+=1
 								else:
-									action = action_data[action_idx]
+									action = np.clip(action_data[action_idx],-1,1)
 							elif (speed == 3):
 								if quit(action_idx_episode_idx+2,total_sub[episode_idx]):
 									action = speed3x(action_data,action_idx)
@@ -364,7 +368,7 @@ def main(args):
 									action_idx+=1
 									action_idx_episode_idx+=1
 								else:
-									action = action_data[action_idx]
+									action = np.clip(action_data[action_idx],-1,1)
 									
 							elif (speed == 4):
 								if quit(action_idx_episode_idx+3,total_sub[episode_idx]):
@@ -380,11 +384,11 @@ def main(args):
 									action_idx+=1
 									action_idx_episode_idx+=1
 								else:
-									action = action_data[action_idx]
+									action = np.clip(action_data[action_idx],-1,1)
 						action_idx+=1	
 
 					else:
-						action = action_data[action_idx]
+						action = np.clip(action_data[action_idx],-1,1)
 						action_idx+=1
 				else:
 					print(total_count_sub)
@@ -419,7 +423,6 @@ def main(args):
 					print("total_sub",total_count_sub)
 					# total_count+=total_count_sub
 					break
-			total_count+=total_count_sub
 			new_count.append(total_count_sub)
 			all_success_rates.append(ep_success)
 			all_traj_rewards.append(ep_reward)
@@ -434,12 +437,23 @@ def main(args):
 			# print("len(action)",len(action_arrays_sub))
 			if not ep_success or ep_success_times < 5:
 				cprint(f'Episode: {episode_idx} failed with reward {ep_reward} and success times {ep_success_times}', 'red')
+				total_count += total_count_sub
+				# print(total_count_sub)
+				# print(len(img_arrays_sub))
+				# print(len(action_arrays_sub))
+				episode_ends_arrays.append(copy.deepcopy(total_count)) # the index of the last step of the episode    
+				img_arrays.extend(copy.deepcopy(img_arrays_sub))
+				point_cloud_arrays.extend(copy.deepcopy(point_cloud_arrays_sub))
+				depth_arrays.extend(copy.deepcopy(depth_arrays_sub))
+				state_arrays.extend(copy.deepcopy(state_arrays_sub))
+				action_arrays.extend(copy.deepcopy(action_arrays_sub))
+				full_state_arrays.extend(copy.deepcopy(full_state_arrays_sub))
 				episode_idx += 1
 			else:
 				total_count += total_count_sub
-				print(total_count)
-				print(len(img_arrays_sub))
-				print(len(action_arrays_sub))
+				# print(total_count_sub)
+				# print(len(img_arrays_sub))
+				# print(len(action_arrays_sub))
 				episode_ends_arrays.append(copy.deepcopy(total_count)) # the index of the last step of the episode    
 				img_arrays.extend(copy.deepcopy(img_arrays_sub))
 				point_cloud_arrays.extend(copy.deepcopy(point_cloud_arrays_sub))
@@ -458,6 +472,7 @@ def main(args):
 	log_data['mean_success_rates'] = np.mean(all_success_rates)	
 	log_data['avg_speed'] = avg_speed(total_count,total_sub)
 	log_data['method'] = method
+	log_data['nmax'] = nmax
 	log_file_path = os.path.join(save_dir, 'logdata.txt')
 	with open(log_file_path, 'w') as f:
 		for key, value in log_data.items():
@@ -488,49 +503,49 @@ def main(args):
     # save data
     ###############################
     # # create zarr file
-	# zarr_root = zarr.group(save_dir)
-	# zarr_data = zarr_root.create_group('data')
-	# zarr_meta = zarr_root.create_group('meta')
-	# # save img, state, action arrays into data, and episode ends arrays into meta
-	# img_arrays = np.stack(img_arrays, axis=0)
-	# if img_arrays.shape[1] == 3: # make channel last
-	# 	img_arrays = np.transpose(img_arrays, (0,2,3,1))
-	# state_arrays = np.stack(state_arrays, axis=0)
-	# full_state_arrays = np.stack(full_state_arrays, axis=0)
-	# point_cloud_arrays = np.stack(point_cloud_arrays, axis=0)
-	# depth_arrays = np.stack(depth_arrays, axis=0)
-	# action_arrays = np.stack(action_arrays, axis=0)
-	# episode_ends_arrays = np.array(episode_ends_arrays)
+	zarr_root = zarr.group(save_dir)
+	zarr_data = zarr_root.create_group('data')
+	zarr_meta = zarr_root.create_group('meta')
+	# save img, state, action arrays into data, and episode ends arrays into meta
+	img_arrays = np.stack(img_arrays, axis=0)
+	if img_arrays.shape[1] == 3: # make channel last
+		img_arrays = np.transpose(img_arrays, (0,2,3,1))
+	state_arrays = np.stack(state_arrays, axis=0)
+	full_state_arrays = np.stack(full_state_arrays, axis=0)
+	point_cloud_arrays = np.stack(point_cloud_arrays, axis=0)
+	depth_arrays = np.stack(depth_arrays, axis=0)
+	action_arrays = np.stack(action_arrays, axis=0)
+	episode_ends_arrays = np.array(episode_ends_arrays)
 
-	# compressor = zarr.Blosc(cname='zstd', clevel=3, shuffle=1)
-	# img_chunk_size = (100, img_arrays.shape[1], img_arrays.shape[2], img_arrays.shape[3])
-	# state_chunk_size = (100, state_arrays.shape[1])
-	# full_state_chunk_size = (100, full_state_arrays.shape[1])
-	# point_cloud_chunk_size = (100, point_cloud_arrays.shape[1], point_cloud_arrays.shape[2])
-	# depth_chunk_size = (100, depth_arrays.shape[1], depth_arrays.shape[2])
-	# action_chunk_size = (100, action_arrays.shape[1])
-	# zarr_data.create_dataset('img', data=img_arrays, chunks=img_chunk_size, dtype='uint8', overwrite=True, compressor=compressor)
-	# zarr_data.create_dataset('state', data=state_arrays, chunks=state_chunk_size, dtype='float32', overwrite=True, compressor=compressor)
-	# zarr_data.create_dataset('full_state', data=full_state_arrays, chunks=full_state_chunk_size, dtype='float32', overwrite=True, compressor=compressor)
-	# zarr_data.create_dataset('point_cloud', data=point_cloud_arrays, chunks=point_cloud_chunk_size, dtype='float32', overwrite=True, compressor=compressor)
-	# zarr_data.create_dataset('depth', data=depth_arrays, chunks=depth_chunk_size, dtype='float32', overwrite=True, compressor=compressor)
-	# zarr_data.create_dataset('action', data=action_arrays, chunks=action_chunk_size, dtype='float32', overwrite=True, compressor=compressor)
-	# zarr_meta.create_dataset('episode_ends', data=episode_ends_arrays, dtype='int64', overwrite=True, compressor=compressor)
+	compressor = zarr.Blosc(cname='zstd', clevel=3, shuffle=1)
+	img_chunk_size = (100, img_arrays.shape[1], img_arrays.shape[2], img_arrays.shape[3])
+	state_chunk_size = (100, state_arrays.shape[1])
+	full_state_chunk_size = (100, full_state_arrays.shape[1])
+	point_cloud_chunk_size = (100, point_cloud_arrays.shape[1], point_cloud_arrays.shape[2])
+	depth_chunk_size = (100, depth_arrays.shape[1], depth_arrays.shape[2])
+	action_chunk_size = (100, action_arrays.shape[1])
+	zarr_data.create_dataset('img', data=img_arrays, chunks=img_chunk_size, dtype='uint8', overwrite=True, compressor=compressor)
+	zarr_data.create_dataset('state', data=state_arrays, chunks=state_chunk_size, dtype='float32', overwrite=True, compressor=compressor)
+	zarr_data.create_dataset('full_state', data=full_state_arrays, chunks=full_state_chunk_size, dtype='float32', overwrite=True, compressor=compressor)
+	zarr_data.create_dataset('point_cloud', data=point_cloud_arrays, chunks=point_cloud_chunk_size, dtype='float32', overwrite=True, compressor=compressor)
+	zarr_data.create_dataset('depth', data=depth_arrays, chunks=depth_chunk_size, dtype='float32', overwrite=True, compressor=compressor)
+	zarr_data.create_dataset('action', data=action_arrays, chunks=action_chunk_size, dtype='float32', overwrite=True, compressor=compressor)
+	zarr_meta.create_dataset('episode_ends', data=episode_ends_arrays, dtype='int64', overwrite=True, compressor=compressor)
 
-	# cprint(f'-'*50, 'cyan')
-	# # print shape
-	# cprint(f'img shape: {img_arrays.shape}, range: [{np.min(img_arrays)}, {np.max(img_arrays)}]', 'green')
-	# cprint(f'point_cloud shape: {point_cloud_arrays.shape}, range: [{np.min(point_cloud_arrays)}, {np.max(point_cloud_arrays)}]', 'green')
-	# cprint(f'depth shape: {depth_arrays.shape}, range: [{np.min(depth_arrays)}, {np.max(depth_arrays)}]', 'green')
-	# cprint(f'state shape: {state_arrays.shape}, range: [{np.min(state_arrays)}, {np.max(state_arrays)}]', 'green')
-	# cprint(f'full_state shape: {full_state_arrays.shape}, range: [{np.min(full_state_arrays)}, {np.max(full_state_arrays)}]', 'green')
-	# cprint(f'action shape: {action_arrays.shape}, range: [{np.min(action_arrays)}, {np.max(action_arrays)}]', 'green')
-	# cprint(f'Saved zarr file to {save_dir}', 'green')
+	cprint(f'-'*50, 'cyan')
+	# print shape
+	cprint(f'img shape: {img_arrays.shape}, range: [{np.min(img_arrays)}, {np.max(img_arrays)}]', 'green')
+	cprint(f'point_cloud shape: {point_cloud_arrays.shape}, range: [{np.min(point_cloud_arrays)}, {np.max(point_cloud_arrays)}]', 'green')
+	cprint(f'depth shape: {depth_arrays.shape}, range: [{np.min(depth_arrays)}, {np.max(depth_arrays)}]', 'green')
+	cprint(f'state shape: {state_arrays.shape}, range: [{np.min(state_arrays)}, {np.max(state_arrays)}]', 'green')
+	cprint(f'full_state shape: {full_state_arrays.shape}, range: [{np.min(full_state_arrays)}, {np.max(full_state_arrays)}]', 'green')
+	cprint(f'action shape: {action_arrays.shape}, range: [{np.min(action_arrays)}, {np.max(action_arrays)}]', 'green')
+	cprint(f'Saved zarr file to {save_dir}', 'green')
 
-	# # clean up
-	# del img_arrays, state_arrays, point_cloud_arrays, action_arrays, episode_ends_arrays, 
-	# del zarr_root, zarr_data, zarr_meta
-	# del e
+	# clean up
+	del img_arrays, state_arrays, point_cloud_arrays, action_arrays, episode_ends_arrays, 
+	del zarr_root, zarr_data, zarr_meta
+	del e
 
 def qpos_plot(save_dir,n_groups,qpos_sub,apos_sub,apos_gripper_sub,qpos_gripper_sub,target_pos_sub,sim_pos_sub,episode_idx):
 	tstep = np.linspace(0, 1, len(qpos_sub)-1) 
@@ -580,6 +595,7 @@ if __name__ == "__main__":
 	parser.add_argument('--root_dir', type=str, default="../../3D-Diffusion-Policy/data/" )
 	parser.add_argument('--method', type=int,default=0)
 	parser.add_argument('--speed', type=int, default = 2)
+	parser.add_argument('--nmax',type=int,default = 10)
 
 	args = parser.parse_args()
 

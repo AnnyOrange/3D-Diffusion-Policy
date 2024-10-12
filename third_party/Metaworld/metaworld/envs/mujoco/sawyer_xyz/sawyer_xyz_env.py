@@ -172,6 +172,7 @@ class SawyerXYZEnv(SawyerMocapBase, metaclass=abc.ABCMeta):
 
 
     def set_xyz_action(self, action,green_action=None):
+      
         if green_action is None:
             # action = np.clip(action, -1, 1)
             action = np.clip(action, -2, 2)
@@ -179,6 +180,8 @@ class SawyerXYZEnv(SawyerMocapBase, metaclass=abc.ABCMeta):
             pos_delta = action * self.action_scale
             # print("self.data.mocap_pos",self.data.mocap_pos)
             # print("action",action)
+            # print("self.data.mocap_pos_________",self.data.mocap_pos)
+            
             new_mocap_pos = self.data.mocap_pos + pos_delta[None]
             # print("new_mocap_pos",new_mocap_pos)
             new_mocap_pos[0, :] = np.clip(
@@ -187,11 +190,12 @@ class SawyerXYZEnv(SawyerMocapBase, metaclass=abc.ABCMeta):
                 self.mocap_high,
             )
             # print("new_mocap_pos_clip",new_mocap_pos)
+            # import pdb;pdb.set_trace()
         else:
             new_mocap_pos=np.array([green_action])
             # print("new_mocap_pos",new_mocap_pos)
         self.target_pos.append(new_mocap_pos[0])
-
+        
         # todo: 按行存到new_mocap_pos.里面。之后好调用
         self.data.set_mocap_pos('mocap', new_mocap_pos)
         self.data.set_mocap_quat('mocap', np.array([1, 0, 1, 0]))

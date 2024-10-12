@@ -70,7 +70,7 @@ class TrainDP3Workspace:
 
     def run(self):
         cfg = copy.deepcopy(self.cfg)
-        print(cfg)
+        # print(cfg)
         if cfg.training.debug:
             cfg.training.num_epochs = 100
             cfg.training.max_train_steps = 10
@@ -93,7 +93,7 @@ class TrainDP3Workspace:
         cfg.training.resume = False
         if cfg.training.resume:
             lastest_ckpt_path = self.get_checkpoint_path()
-            print(lastest_ckpt_path)
+            # print(lastest_ckpt_path)
             if lastest_ckpt_path.is_file():
                 print(f"Resuming from checkpoint {lastest_ckpt_path}")
                 self.load_checkpoint(path=lastest_ckpt_path)
@@ -262,7 +262,6 @@ class TrainDP3Workspace:
                 # print(f"rollout time: {t4-t3:.3f}")
                 # log all
                 step_log.update(runner_log)
-
             
                 
             # run validation

@@ -178,7 +178,7 @@ def main(args):
 				full_state_arrays_sub.append(raw_state)
 				
 				action = mw_policy.get_action(raw_state)
-				qpos = action[:3]/100+raw_state[:3]
+				qpos = np.clip(action[:3],-1,1)/100+raw_state[:3]
 				# qpos = action[:3]+raw_state[:3]
 				# print("raw_state",raw_state[:3])
 				apos_sub.append(raw_state[:3])
@@ -193,14 +193,6 @@ def main(args):
 				# print("action",action[:3]+raw_state[:3])
 				action_arrays_sub.append(action)
 				obs_dict, reward, done, info = e.step(action)
-				# current_mocap_pos = e.data.get_mocap_pos('mocap')
-				# print("current_mocap_pos",current_mocap_pos)
-				# print("obs",len(obs_dict['full_state']))
-				# print("action",action)
-				# print("action",action)
-				# print("obs_dict",obs_dict)
-				# print("info",info)
-				# print("info",info['grasp_success'])
 				info_near_arrays_sub.append(info['near_object'])
 				info_grasp_arrays_sub.append(info['grasp_success'])
 
@@ -380,7 +372,7 @@ def qpos_plot(save_dir,n_groups,qpos_sub,apos_sub,apos_gripper_sub,qpos_gripper_
 	os.makedirs(os.path.dirname(save_path), exist_ok=True)
 	for n, ax in enumerate(axes):
 		ax.plot(tstep, np.array(apos_sub)[1:, n], label=f'real qpos {n}')
-		ax.plot(tstep, np.array(qpos_sub)[1:, n], label=f'sim target qpos {n}')
+		# ax.plot(tstep, np.array(qpos_sub)[1:, n], label=f'sim target qpos {n}')
 		ax.plot(tstep, np.array(target_pos_sub)[1:, n], label=f'target qpos {n}')
 		ax.set_title(f'qpos {n}')
 		ax.legend()
@@ -390,7 +382,7 @@ def qpos_plot(save_dir,n_groups,qpos_sub,apos_sub,apos_gripper_sub,qpos_gripper_
 		plt.tight_layout()
 		fig.savefig(os.path.join(save_dir, f"plot/rollout{episode_idx}_qpos.png"))
 		plt.close(fig)
-	tstep = np.linspace(0, 1, len(qpos_sub)-1) 
+	tstep = np.linspace(0, 1, len(apos_sub)-1) 
 	apos_gripper_sub = np.expand_dims(apos_gripper_sub, axis=1)
 	n_groups = 1
 	fig, axes = plt.subplots(nrows=n_groups, ncols=1, figsize=(8, 2 * n_groups), sharex=True)
